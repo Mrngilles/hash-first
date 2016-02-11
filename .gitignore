@@ -1,3 +1,6 @@
+# Ignore zipped code
+hash_code.zip
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
