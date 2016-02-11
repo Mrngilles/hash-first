@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+./.tox/py35/bin/py.test
