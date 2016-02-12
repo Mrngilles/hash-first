@@ -15,141 +15,130 @@ class Main {
 }
 
 object Main extends App {
-
   var numOfRows = 0
   var numOfColumns = 0
   var numOfDrones = 0
   var numOfTurns = 0
   var maxPayLoad = 0
 
-  // index = product id, value = product weight
-  val productWeights = ListBuffer[Int]()
-
-  var numOfWarehouses = 0
-  var numOfOrders = 0
-
   // main data structures
   val warehouses = ListBuffer[Warehouse]()
   val orders = ListBuffer[Order]()
   val drones = ListBuffer[Drone]()
 
-  // Parse input
-  val filename = "input/busy_day.in"
-  var index = 0
-  var warehouseStartIndex = 3
-  var orderStartIndex = 0
-  var warehouseIndex = 0
-  var orderIndex = 0
-  var warehouse = new Warehouse()
-  var order = new Order()
-  for (line <- Source.fromFile(filename).getLines) {
-    // main parameters
-    if (index == 0) {
-      val array = line.split(" ").map(_.toInt)
-      numOfRows = array(0)
-      numOfColumns = array(1)
-      numOfDrones = array(2)
-      numOfTurns = array(3)
-      maxPayLoad = array(4)
-    }
-    // weight of each product
-    else if (index == 2) {
-      val weights = line.split(" ").map(_.toInt)
-      weights.foreach(weight => productWeights += weight)
-    }
-    // warehouses
-    else if (index == warehouseStartIndex) {
-      numOfWarehouses = line.toInt
-      orderStartIndex = warehouseStartIndex + 2 * numOfWarehouses + 1
-    }
-    else if (warehouseStartIndex + 1 <= index && index <= warehouseStartIndex + numOfWarehouses * 2) {
-      if (warehouseIndex % 2 == 0) {
-        warehouse = new Warehouse
-        warehouse.id = warehouseIndex / 2
+  def parseInput(fileName: String): Unit = {
+    // Initialize variables
+    var numOfWarehouses = 0
+    var numOfOrders = 0
+
+    var index = 0
+    val warehouseStartIndex = 3
+    var orderStartIndex = 0
+    var warehouseIndex = 0
+    var orderIndex = 0
+
+    var warehouse = new Warehouse()
+    var order = new Order()
+
+    warehouses.clear()
+    orders.clear()
+    drones.clear()
+
+    // index = product id, value = product weight
+    val productWeights = new ListBuffer[Int]()
+
+    // Processing file
+    for (line <- Source.fromFile(fileName).getLines) {
+      // main parameters
+      if (index == 0) {
         val array = line.split(" ").map(_.toInt)
-        warehouse.x = array(0)
-        warehouse.y = array(1)
+        numOfRows = array(0)
+        numOfColumns = array(1)
+        numOfDrones = array(2)
+        numOfTurns = array(3)
+        maxPayLoad = array(4)
+      }
+      // weight of each product
+      else if (index == 2) {
+        val weights = line.split(" ").map(_.toInt)
+        weights.foreach(weight => productWeights += weight)
+      }
+      // warehouses
+      else if (index == warehouseStartIndex) {
+        numOfWarehouses = line.toInt
+        orderStartIndex = warehouseStartIndex + 2 * numOfWarehouses + 1
+      }
+      else if (warehouseStartIndex + 1 <= index && index <= warehouseStartIndex + numOfWarehouses * 2) {
+        if (warehouseIndex % 2 == 0) {
+          warehouse = new Warehouse
+          warehouse.id = warehouseIndex / 2
+          val array = line.split(" ").map(_.toInt)
+          warehouse.x = array(0)
+          warehouse.y = array(1)
 
-        // at the beginning all drones stay at warehouse 0
-        if (warehouse.id == 0) {
-          for (id <- 0 until numOfDrones) {
-            val drone: Drone = new Drone(id = id)
-            drone.x = warehouse.x
-            drone.y = warehouse.y
-            drones += drone
+          // at the beginning all drones stay at warehouse 0
+          if (warehouse.id == 0) {
+            for (id <- 0 until numOfDrones) {
+              val drone: Drone = new Drone(id = id)
+              drone.x = warehouse.x
+              drone.y = warehouse.y
+              drones += drone
+            }
           }
-        }
-      } else {
-        var productId = 0
-        var products = new ListBuffer[Product]
-        line.split(" ").foreach { quantity =>
-          products += new Product(productId, quantity.toInt, productWeights(productId))
-          productId += 1
-        }
-        warehouse.products = products.toList
+        } else {
+          var productId = 0
+          var products = new ListBuffer[Product]
+          line.split(" ").foreach { quantity =>
+            products += new Product(productId, quantity.toInt, productWeights(productId))
+            productId += 1
+          }
+          warehouse.products = products.toList
 
-        warehouses += warehouse
+          warehouses += warehouse
+        }
+
+        warehouseIndex += 1
+      }
+      // orders
+      else if (index == orderStartIndex) {
+        numOfOrders = line.toInt
+      }
+      else if (orderStartIndex + 1 <= index && index <= orderStartIndex + numOfOrders * 3) {
+        if (orderIndex % 3 == 0) {
+          order = new Order
+          order.id = orderIndex / 3
+          val array = line.split(" ").map(_.toInt)
+          order.x = array(0)
+          order.y = array(1)
+        } else if (orderIndex % 3 == 2) {
+          val products = new ListBuffer[Product]
+          var product: Product = null
+          line.split(" ").foreach { productId =>
+            product = new Product(productId.toInt, 1, productWeights(productId.toInt))
+            if (!products.contains(product)) {
+              products += product
+            } else {
+              product.quantity += 1
+            }
+          }
+          order.products = products.toList
+
+          orders += order
+        }
+
+        orderIndex += 1
       }
 
-      warehouseIndex += 1
+      index += 1
     }
-    // orders
-    else if (index == orderStartIndex) {
-      numOfOrders = line.toInt
-    }
-    else if (orderStartIndex + 1 <= index && index <= orderStartIndex + numOfOrders * 3) {
-      if (orderIndex % 3 == 0) {
-        order = new Order
-        order.id = orderIndex / 3
-        val array = line.split(" ").map(_.toInt)
-        order.x = array(0)
-        order.y = array(1)
-      } else if (orderIndex % 3 == 2) {
-        val products = new ListBuffer[Product]
-        var product: Product = null
-        line.split(" ").foreach { productId =>
-          product = new Product(productId.toInt, 1, productWeights(productId.toInt))
-          if (!products.contains(product)) {
-            products += product
-          } else {
-            product.quantity += 1
-          }
-        }
-        order.products = products.toList
-
-        orders += order
-      }
-
-      orderIndex += 1
-    }
-
-    index += 1
   }
 
-//  warehouses.foreach(println)
-//  orders.foreach(println)
-  val commands = new ListBuffer[String]()
-  var countCompletedOrder = 0
-  val smallOrders = orders.filter(order => order.isSmall)
-  val queue = drones
-  while (smallOrders.size > 0 && queue.size > 0) {
-    val drone = queue.head
-    queue -= drone
-
-    val nearestSmallOrder = drone.nearestOrder(smallOrders)
-    if (nearestSmallOrder != null) {
-      val nearestWarehouse = drone.nearestWarehouse(warehouses, nearestSmallOrder)
-      if (nearestWarehouse != null) {
-        commands ++= drone.load(nearestSmallOrder, nearestWarehouse)
-        commands ++= drone.deliver(nearestSmallOrder)
-
-        orders -= nearestSmallOrder
-        countCompletedOrder += 1
-        println(countCompletedOrder)
-
-        if (drone.isAvailable) queue += drone
-      }
-    }
+  def generateOutput(fileName: String, commands: ListBuffer[String]): Unit = {
+    val file = new File(fileName)
+    val bw = new BufferedWriter(new FileWriter(file))
+    bw.write(commands.size + "\n")
+    for (command <- commands) bw.write(command)
+    bw.close()
   }
 
   /***
@@ -163,9 +152,46 @@ object Main extends App {
       append this drone to end of the queue
   ***/
 
-  val file = new File("output/busy_day.out")
-  val bw = new BufferedWriter(new FileWriter(file))
-  bw.write(commands.size + "\n")
-  for (command <- commands) bw.write(command)
-  bw.close()
+  def generateCommands(): ListBuffer[String] = {
+    val commands = new ListBuffer[String]()
+    val smallOrders = orders.filter(order => order.isSmall)
+    val waitingOrders = new ListBuffer[Order]
+    val queue = drones
+    while (smallOrders.nonEmpty && queue.nonEmpty) {
+      println(s"small orders ${smallOrders.size}, queue ${queue.size}")
+
+      val drone = queue.head
+      queue -= drone
+
+      val nearestSmallOrder = drone.nearestOrder(smallOrders)
+      if (nearestSmallOrder != null) {
+        val nearestWarehouse = drone.nearestWarehouse(warehouses, nearestSmallOrder)
+        if (nearestWarehouse != null) {
+          val load: List[String] = drone.load(nearestSmallOrder, nearestWarehouse)
+          commands ++= load
+          val deliver: List[String] = drone.deliver(nearestSmallOrder)
+          commands ++= deliver
+
+          if (drone.isAvailable) {
+            println("enqueue")
+            queue += drone
+          }
+        } else {
+          // this order needs products from at least 2 warehouses
+          println("waiting order")
+          waitingOrders += nearestSmallOrder
+        }
+
+        smallOrders -= nearestSmallOrder
+      }
+    }
+
+    commands
+  }
+
+  for (fileName <- Array("busy_day.in", "mother_of_all_warehouses.in", "redundancy.in")) {
+    println("FILE " + fileName)
+    Main.parseInput("input/" + fileName)
+    Main.generateOutput("output/" + fileName.replace(".in", ".out"), Main.generateCommands())
+  }
 }
