@@ -62,6 +62,7 @@ object Main extends App {
     else if (warehouseStartIndex + 1 <= index && index <= warehouseStartIndex + numOfWarehouses * 2) {
       if (warehouseIndex % 2 == 0) {
         warehouse = new Warehouse
+        warehouse.id = warehouseIndex / 2
         val array = line.split(" ").map(_.toInt)
         warehouse.x = array(0)
         warehouse.y = array(1)
@@ -86,6 +87,7 @@ object Main extends App {
     else if (orderStartIndex + 1 <= index && index <= orderStartIndex + numOfOrders * 3) {
       if (orderIndex % 3 == 0) {
         order = new Order
+        order.id = orderIndex / 3
         val array = line.split(" ").map(_.toInt)
         order.x = array(0)
         order.y = array(1)
@@ -111,10 +113,19 @@ object Main extends App {
     index += 1
   }
 
+//  warehouses.foreach(println)
+//  orders.foreach(println)
   println(warehouses.size, orders.size)
   var count = 0
   orders.foreach{order =>
     if (order.isSmall) count += 1
   }
   println(count)
+
+  /***
+  for each drone
+    find nearest small order
+    load products (update turns)
+    deliver products (update turns)
+  ***/
 }
