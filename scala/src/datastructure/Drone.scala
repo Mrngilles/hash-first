@@ -18,7 +18,7 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
     * @param orders
     * @return the order that is nearest to drone's location
     */
-  def nearestOrder(orders: ListBuffer[Order]): Order = {
+  def findNearestOrder(orders: ListBuffer[Order]): Order = {
     var nearestOrder: Order = null
     var nearestDistance = Int.MaxValue
     orders.filter(order => !order.isProcessing).foreach { order =>
@@ -37,10 +37,15 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
     nearestOrder
   }
 
-  def nearestWarehouse(warehouses: ListBuffer[Warehouse], order: Order): Warehouse = {
+  /**
+    * @param warehouses
+    * @param smallOrder
+    * @return The closest warehouse from drone and can serve this small order
+    */
+  def fineNearestWarehouse(warehouses: ListBuffer[Warehouse], smallOrder: Order): Warehouse = {
     var nearestWarehouse: Warehouse = null
     var nearestDistance = Int.MaxValue
-    warehouses.filter(warehouse => warehouse.canServe(order)).foreach { warehouse =>
+    warehouses.filter(warehouse => warehouse.canServe(smallOrder)).foreach { warehouse =>
       val distance: Int = warehouse.distanceTo(this)
       if (distance < nearestDistance) {
         nearestDistance = distance
@@ -50,6 +55,8 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
 
     nearestWarehouse
   }
+
+
 
   /**
     * @param order

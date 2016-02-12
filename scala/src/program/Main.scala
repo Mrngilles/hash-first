@@ -163,9 +163,9 @@ object Main extends App {
       val drone = queue.head
       queue -= drone
 
-      val nearestSmallOrder = drone.nearestOrder(smallOrders)
+      val nearestSmallOrder = drone.findNearestOrder(smallOrders)
       if (nearestSmallOrder != null) {
-        val nearestWarehouse = drone.nearestWarehouse(warehouses, nearestSmallOrder)
+        val nearestWarehouse = drone.fineNearestWarehouse(warehouses, nearestSmallOrder)
         if (nearestWarehouse != null) {
           val load: List[String] = drone.load(nearestSmallOrder, nearestWarehouse)
           commands ++= load
@@ -178,6 +178,8 @@ object Main extends App {
           }
         } else {
           // this order needs products from at least 2 warehouses
+          // TODO find list of warehouses for this order
+          // theses warehouses should near to the drone
           println("waiting order")
           waitingOrders += nearestSmallOrder
         }
@@ -189,7 +191,7 @@ object Main extends App {
     commands
   }
 
-  for (fileName <- Array("busy_day.in", "mother_of_all_warehouses.in", "redundancy.in")) {
+  for (fileName <- Array("busy_day.in"/*, "mother_of_all_warehouses.in", "redundancy.in"*/)) {
     println("FILE " + fileName)
     Main.parseInput("input/" + fileName)
     Main.generateOutput("output/" + fileName.replace(".in", ".out"), Main.generateCommands())
