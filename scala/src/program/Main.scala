@@ -1,11 +1,17 @@
+package program
+
+import datastructure.{Order, Product, Warehouse}
+
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
-
-import datastructure.{Order, Warehouse, Product}
 
 /**
   * Created by duccao on 12/02/16.
   */
+class Main {
+  val maxPayLoad = Main.maxPayLoad
+}
+
 object Main extends App {
 
   var numOfRows = 0
@@ -106,5 +112,9 @@ object Main extends App {
   }
 
   println(warehouses.size, orders.size)
-  orders.foreach(order => println(order.totalWeight))
+  var count = 0
+  orders.foreach{order =>
+    if (order.isSmall) count += 1
+  }
+  println(count)
 }
