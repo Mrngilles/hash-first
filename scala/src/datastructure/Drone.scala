@@ -32,12 +32,20 @@ class Drone (var id: Int = -1, var x: Int = 0, var y: Int = 0,
     * @param order
     * @return list commands we use to load all products of this order
     */
-  def load(order: Order, warehouse: Warehouse): List[String] = {
+  def process(order: Order, warehouse: Warehouse, commandCode: String): List[String] = {
     val commands = new ListBuffer[String]
-    order.products.foreach(product => commands += s"$id L ${warehouse.id} ${product.id} ${product.quantity}")
+    order.products.foreach(product => commands += s"$id $commandCode ${warehouse.id} ${product.id} ${product.quantity}")
 
-    turns += 0
+    turns += distanceTo(warehouse) + 1
 
     commands.toList
+  }
+
+  def load(order: Order, warehouse: Warehouse, commandCode: String): List[String] = {
+    process(order, warehouse, "L")
+  }
+
+  def unload(order: Order, warehouse: Warehouse, commandCode: String): List[String] = {
+    process(order, warehouse, "U")
   }
 }
