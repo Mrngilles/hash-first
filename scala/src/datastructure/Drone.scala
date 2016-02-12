@@ -57,7 +57,7 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
     */
   def process(order: Order, warehouse: Warehouse, commandCode: String): List[String] = {
     val commands = new ListBuffer[String]
-    order.products.foreach(product => commands += s"$id $commandCode ${warehouse.id} ${product.id} ${product.quantity}")
+    order.products.foreach(product => commands += s"$id $commandCode ${warehouse.id} ${product.id} ${product.quantity}\n")
 
     turns += distanceTo(warehouse) + 1
 
@@ -74,7 +74,7 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
 
   def deliver(order: Order): List[String] = {
     val commands = new ListBuffer[String]
-    order.products.foreach(product => commands += s"$id D ${order.id} ${product.id} ${product.quantity}")
+    order.products.foreach(product => commands += s"$id D ${order.id} ${product.id} ${product.quantity}\n")
 
     turns += distanceTo(order) + 1
 

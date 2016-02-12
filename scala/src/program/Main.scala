@@ -1,5 +1,7 @@
 package program
 
+import java.io.{File, BufferedWriter, FileWriter}
+
 import datastructure.{Drone, Order, Product, Warehouse}
 
 import scala.collection.mutable.ListBuffer
@@ -126,6 +128,7 @@ object Main extends App {
 
 //  warehouses.foreach(println)
 //  orders.foreach(println)
+  val commands = new ListBuffer[String]()
   var countCompletedOrder = 0
   val smallOrders = orders.filter(order => order.isSmall)
   val queue = drones
@@ -136,8 +139,8 @@ object Main extends App {
     val nearestSmallOrder = drone.nearestOrder(smallOrders)
     if (nearestSmallOrder != null) {
       val nearestWarehouse = drone.nearestWarehouse(warehouses)
-      drone.load(nearestSmallOrder, nearestWarehouse)
-      drone.deliver(nearestSmallOrder)
+      commands ++= drone.load(nearestSmallOrder, nearestWarehouse)
+      commands ++= drone.deliver(nearestSmallOrder)
 
       orders -= nearestSmallOrder
       countCompletedOrder += 1
@@ -157,4 +160,10 @@ object Main extends App {
     if this drone is still available
       append this drone to end of the queue
   ***/
+
+  val file = new File("output/busy_day.out")
+  val bw = new BufferedWriter(new FileWriter(file))
+  bw.write(commands.size + "\n")
+  for (command <- commands) bw.write(command)
+  bw.close()
 }
