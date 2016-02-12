@@ -87,7 +87,7 @@ object Main extends App {
         val products = new ListBuffer[Product]
         var product: Product = null
         line.split(" ").foreach { productId =>
-          product = new Product(productId.toInt, 1, productWeights(productId))
+          product = new Product(productId.toInt, 1, productWeights(productId.toInt))
           if (!products.contains(product)) {
             products += product
           } else {
@@ -106,4 +106,5 @@ object Main extends App {
   }
 
   println(warehouses.size, orders.size)
+  orders.foreach(order => println(order.totalWeight))
 }
