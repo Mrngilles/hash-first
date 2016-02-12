@@ -71,7 +71,10 @@ object Main extends App {
         // at the beginning all drones stay at warehouse 0
         if (warehouse.id == 0) {
           for (id <- 0 until numOfDrones) {
-            drones += new Drone(id = id, x = warehouse.x, y = warehouse.y)
+            val drone: Drone = new Drone(id = id)
+            drone.x = warehouse.x
+            drone.y = warehouse.y
+            drones += drone
           }
         }
       } else {
