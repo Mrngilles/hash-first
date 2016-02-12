@@ -25,7 +25,7 @@ object Main extends App {
   val orders = ListBuffer[Order]()
 
   // Parse input
-  val filename = "input/sample.in"
+  val filename = "input/busy_day.in"
   var index = 0
   var warehouseStartIndex = 3
   var orderStartIndex = 0
