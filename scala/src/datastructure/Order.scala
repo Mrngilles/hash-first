@@ -22,4 +22,9 @@ class Order(var id: Int = -1, var x: Int = 0, var y: Int = 0,
   def isSmall: Boolean = {
     totalWeight <= Main.maxPayLoad
   }
+
+  def distanceTo(drone: Drone): Int = {
+    Math.ceil( Math.sqrt(Math.pow(drone.x - this.x, 2) + Math.pow(drone.y - this.y, 2)) )
+      .toInt
+  }
 }

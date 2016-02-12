@@ -1,6 +1,6 @@
 package program
 
-import datastructure.{Order, Product, Warehouse}
+import datastructure.{Drone, Order, Product, Warehouse}
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
@@ -29,6 +29,7 @@ object Main extends App {
   // main data structures
   val warehouses = ListBuffer[Warehouse]()
   val orders = ListBuffer[Order]()
+  val drones = ListBuffer[Drone]()
 
   // Parse input
   val filename = "input/busy_day.in"
@@ -66,6 +67,13 @@ object Main extends App {
         val array = line.split(" ").map(_.toInt)
         warehouse.x = array(0)
         warehouse.y = array(1)
+
+        // at the beginning all drones stay at warehouse 0
+        if (warehouse.id == 0) {
+          for (id <- 0 until numOfDrones) {
+            drones += new Drone(id = id, x = warehouse.x, y = warehouse.y)
+          }
+        }
       } else {
         var productId = 0
         var products = new ListBuffer[Product]
@@ -115,12 +123,8 @@ object Main extends App {
 
 //  warehouses.foreach(println)
 //  orders.foreach(println)
-  println(warehouses.size, orders.size)
-  var count = 0
-  orders.foreach{order =>
-    if (order.isSmall) count += 1
-  }
-  println(count)
+  val smallOrders = orders.filter(order => order.isSmall)
+  drones.foreach(drone => println(drone.nearestOrder(smallOrders).totalWeight))
 
   /***
   for each drone
