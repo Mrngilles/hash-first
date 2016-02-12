@@ -1,5 +1,7 @@
 package datastructure
 
+import program.Main
+
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -10,6 +12,8 @@ class Drone (var id: Int = -1, var x: Int = 0, var y: Int = 0,
   override def toString = s"Drone(id $id, ($x, $y), products = $products)"
 
   var turns = 0
+
+  def isAvailable = turns <= Main.numOfTurns
 
   def nearestOrder(orders: ListBuffer[Order]): Order = {
     var nearestOrder: Order = null
