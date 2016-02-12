@@ -1,3 +1,6 @@
+scala/.idea/
+scala/*.iml
+
 # Ignore zipped code
 hash_code.zip
 
