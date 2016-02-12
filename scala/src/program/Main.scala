@@ -127,7 +127,12 @@ object Main extends App {
 //  warehouses.foreach(println)
 //  orders.foreach(println)
   val smallOrders = orders.filter(order => order.isSmall)
-  drones.foreach(drone => println(drone.nearestOrder(smallOrders).id))
+  drones.foreach { drone =>
+    val nearestSmallOrder = drone.nearestOrder(smallOrders)
+    val nearestWarehouse = drone.nearestWarehouse(warehouses)
+    drone.load
+    println(nearestWarehouse.id)
+  }
 
   /***
   for each drone
