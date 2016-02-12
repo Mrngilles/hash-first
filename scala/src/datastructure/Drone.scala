@@ -2,6 +2,8 @@ package datastructure
 
 import program.Main
 
+import scala.util.control.Breaks._
+
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -56,7 +58,37 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
     nearestWarehouse
   }
 
+  def findNearestWarehouses(warehouses: ListBuffer[Warehouse], smallOrder: Order): List[Warehouse] = {
+    val onDemandProducts = new ListBuffer[Product]
+    smallOrder.products.map(product => onDemandProducts += product.copy())
 
+    val results = new ListBuffer[Warehouse]
+    breakable {
+      val nearestWarehouses = warehouses.sortBy(warehouse => this.distanceTo(warehouse))
+      for (warehouse <- nearestWarehouses) {
+        for (i <- onDemandProducts.indices) {
+          var onDemandProduct = onDemandProducts(i)
+          // find the desired product from warehouse, then update quantity in demand list
+          warehouse.products.filter(product => product.equals(onDemandProduct))
+            .foreach(product => onDemandProduct = onDemandProduct.remove(product.quantity))
+        }
+
+        results += warehouse
+
+        var allProductsFound = true
+        breakable {
+          for (product <- onDemandProducts) {
+            allProductsFound = product.quantity == 0
+            if (!allProductsFound) break
+          }
+        }
+
+        if (allProductsFound) break
+      }
+    }
+
+    results.toList
+  }
 
   /**
     * @param order
@@ -73,9 +105,12 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
 
   def load(order: Order, warehouse: Warehouse): List[String] = {
     order.products.foreach { onDroneProduct =>
-      warehouse.products = warehouse.products
+      warehouse.products
         .filter(product => product.equals(onDroneProduct))
-        .map(product => product.update(onDroneProduct.quantity))
+        .map { product =>
+          warehouse.products -= product
+          warehouse.products += product.remove(onDroneProduct.quantity)
+        }
     }
 
     process(order, warehouse, "L")

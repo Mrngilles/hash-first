@@ -1,10 +1,12 @@
 package datastructure
+
+import scala.collection.mutable.ListBuffer
 import scala.util.control.Breaks._
 
 /**
   * Created by duccao on 12/02/16.
   */
-class Warehouse(var id: Int = -1, var products: List[Product] = List.empty) extends Point {
+class Warehouse(var id: Int = -1, var products: ListBuffer[Product] = ListBuffer.empty) extends Point {
   override def toString = s"Warehouse(id $id, ($x, $y), products = $products)"
 
   def canServe(order: Order): Boolean = {
@@ -18,5 +20,12 @@ class Warehouse(var id: Int = -1, var products: List[Product] = List.empty) exte
     }
 
     canServe
+  }
+
+  def totalQuantity(): Int = {
+    var total = 0
+    products.foreach(product => total += product.quantity)
+
+    total
   }
 }

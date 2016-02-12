@@ -17,6 +17,13 @@ class Order(var id: Int = -1, var products: List[Product] = List.empty) extends 
     sum
   }
 
+  def totalQuantity(): Int = {
+    var total = 0
+    products.foreach(product => total += product.quantity)
+
+    total
+  }
+
   /**
     * @return true if this order can be server by only 1 drone
     */

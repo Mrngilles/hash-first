@@ -92,7 +92,7 @@ object Main extends App {
             products += new Product(productId, quantity.toInt, productWeights(productId))
             productId += 1
           }
-          warehouse.products = products.toList
+          warehouse.products = products
 
           warehouses += warehouse
         }
@@ -155,8 +155,17 @@ object Main extends App {
   def generateCommands(): ListBuffer[String] = {
     val commands = new ListBuffer[String]()
     val smallOrders = orders.filter(order => order.isSmall)
-    val waitingOrders = new ListBuffer[Order]
     val queue = drones
+
+    def processOrder(drone: Drone, nearestSmallOrder: Order, nearestWarehouse: Warehouse, queueAfter : Boolean = true): Any = {
+      val load: List[String] = drone.load(nearestSmallOrder, nearestWarehouse)
+      commands ++= load
+      val deliver: List[String] = drone.deliver(nearestSmallOrder)
+      commands ++= deliver
+
+      if (drone.isAvailable && queueAfter) queue += drone
+    }
+
     while (smallOrders.nonEmpty && queue.nonEmpty) {
       println(s"small orders ${smallOrders.size}, queue ${queue.size}")
 
@@ -167,21 +176,17 @@ object Main extends App {
       if (nearestSmallOrder != null) {
         val nearestWarehouse = drone.fineNearestWarehouse(warehouses, nearestSmallOrder)
         if (nearestWarehouse != null) {
-          val load: List[String] = drone.load(nearestSmallOrder, nearestWarehouse)
-          commands ++= load
-          val deliver: List[String] = drone.deliver(nearestSmallOrder)
-          commands ++= deliver
-
-          if (drone.isAvailable) {
-            println("enqueue")
-            queue += drone
-          }
+          processOrder(drone, nearestSmallOrder, nearestWarehouse)
         } else {
           // this order needs products from at least 2 warehouses
           // TODO find list of warehouses for this order
           // theses warehouses should near to the drone
-          println("waiting order")
-          waitingOrders += nearestSmallOrder
+          println("several warehouses")
+
+          val nearestWarehouses: List[Warehouse] = drone.findNearestWarehouses(warehouses, nearestSmallOrder)
+          nearestWarehouses.foreach(warehouse => processOrder(drone, nearestSmallOrder, warehouse, queueAfter = false))
+
+          if (drone.isAvailable) queue += drone
         }
 
         smallOrders -= nearestSmallOrder

@@ -6,8 +6,12 @@ package datastructure
 class Product(var id: Int = -1, var quantity: Int = 0, var weight: Int = 0) {
   override def toString = s"Product(id $id, quantity $quantity, weight $weight)"
 
-  def update(removedQuantity: Int): Product = {
+  def remove(removedQuantity: Int): Product = {
     new Product(id, quantity - removedQuantity, weight)
+  }
+
+  def copy(): Product = {
+    new Product(id, quantity, weight)
   }
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[Product]
