@@ -9,6 +9,8 @@ class Order(var id: Int = -1, var x: Int = 0, var y: Int = 0,
             var products: List[Product] = List.empty) extends Point(x, y) {
   override def toString = s"Order(id $id, ($x, $y), products = $products)"
 
+  var isProcessing = false
+
   def totalWeight: Int = {
     var sum = 0
     products.foreach(product => sum += product.weight)
