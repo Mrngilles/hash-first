@@ -1,6 +1,8 @@
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
+import datastructure.{Order, Warehouse, Product}
+
 /**
   * Created by duccao on 12/02/16.
   */
@@ -18,6 +20,10 @@ object Main extends App {
   var numOfWarehouses = 0
   var numOfOrders = 0
 
+  // main data structures
+  val warehouses = ListBuffer[Warehouse]()
+  val orders = ListBuffer[Order]()
+
   // Parse input
   val filename = "input/sample.in"
   var index = 0
@@ -25,6 +31,8 @@ object Main extends App {
   var orderStartIndex = 0
   var warehouseIndex = 0
   var orderIndex = 0
+  var warehouse = new Warehouse()
+  var order = new Order()
   for (line <- Source.fromFile(filename).getLines) {
     // main parameters
     if (index == 0) {
@@ -47,11 +55,20 @@ object Main extends App {
     }
     else if (warehouseStartIndex + 1 <= index && index <= warehouseStartIndex + numOfWarehouses * 2) {
       if (warehouseIndex % 2 == 0) {
+        warehouse = new Warehouse
         val array = line.split(" ").map(_.toInt)
-        val x = array(0)
-        val y = array(1)
+        warehouse.x = array(0)
+        warehouse.y = array(1)
       } else {
-        val quantities = line.split(" ").map(_.toInt)
+        var productId = 0
+        var products = new ListBuffer[Product]
+        line.split(" ").foreach { quantity =>
+          products += new Product(productId, quantity.toInt)
+          productId += 1
+        }
+        warehouse.products = products.toList
+
+        warehouses += warehouse
       }
 
       warehouseIndex += 1
@@ -62,11 +79,24 @@ object Main extends App {
     }
     else if (orderStartIndex + 1 <= index && index <= orderStartIndex + numOfOrders * 3) {
       if (orderIndex % 3 == 0) {
+        order = new Order
         val array = line.split(" ").map(_.toInt)
-        val x = array(0)
-        val y = array(1)
+        order.x = array(0)
+        order.y = array(1)
       } else if (orderIndex % 3 == 2) {
-        val quantities = line.split(" ").map(_.toInt)
+        val products = new ListBuffer[Product]
+        var product: Product = null
+        line.split(" ").foreach { productId =>
+          product = new Product(productId.toInt, 1)
+          if (!products.contains(product)) {
+            products += product
+          } else {
+            product.quantity += 1
+          }
+        }
+        order.products = products.toList
+
+        orders += order
       }
 
       orderIndex += 1
@@ -75,4 +105,6 @@ object Main extends App {
     index += 1
   }
 
+  warehouses.foreach(println)
+  orders.foreach(println)
 }
