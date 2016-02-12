@@ -126,18 +126,35 @@ object Main extends App {
 
 //  warehouses.foreach(println)
 //  orders.foreach(println)
+  var countCompletedOrder = 0
   val smallOrders = orders.filter(order => order.isSmall)
-  drones.foreach { drone =>
+  val queue = drones
+  while (smallOrders.size > 0 && queue.size > 0) {
+    val drone = queue.head
+    queue -= drone
+
     val nearestSmallOrder = drone.nearestOrder(smallOrders)
-    val nearestWarehouse = drone.nearestWarehouse(warehouses)
-    drone.load
-    println(nearestWarehouse.id)
+    if (nearestSmallOrder != null) {
+      val nearestWarehouse = drone.nearestWarehouse(warehouses)
+      drone.load(nearestSmallOrder, nearestWarehouse)
+      drone.deliver(nearestSmallOrder)
+
+      orders -= nearestSmallOrder
+      countCompletedOrder += 1
+      println(countCompletedOrder)
+
+      if (drone.isAvailable) queue += drone
+    }
   }
 
   /***
-  for each drone
-    find nearest small order
-    load products (update turns)
-    deliver products (update turns)
+  queue = all drones
+  when queue still has drones
+    select first drone of the queue
+      find nearest small order
+      load products (update turns)
+      deliver products (update turns)
+    if this drone is still available
+      append this drone to end of the queue
   ***/
 }

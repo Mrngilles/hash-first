@@ -14,6 +14,10 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
 
   def isAvailable = turns <= Main.numOfTurns
 
+  /**
+    * @param orders
+    * @return the order that is nearest to drone's location
+    */
   def nearestOrder(orders: ListBuffer[Order]): Order = {
     var nearestOrder: Order = null
     var nearestDistance = Int.MaxValue
@@ -25,8 +29,10 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
       }
     }
 
-    // we gonna process this order now
-    nearestOrder.isProcessing = true
+    if (nearestOrder != null) {
+      // we gonna process this order now
+      nearestOrder.isProcessing = true
+    }
 
     nearestOrder
   }
