@@ -5,24 +5,10 @@ import program.Main
 /**
   * Created by duccao on 12/02/16.
   */
-class Order(var id: Int = -1, var products: List[Product] = List.empty) extends Point {
+class Order extends ProductContainer {
   override def toString = s"Order(id $id, ($x, $y), products = $products)"
 
   var isProcessing = false
-
-  def totalWeight: Int = {
-    var sum = 0
-    products.foreach(product => sum += product.weight)
-
-    sum
-  }
-
-  def totalQuantity(): Int = {
-    var total = 0
-    products.foreach(product => total += product.quantity)
-
-    total
-  }
 
   /**
     * @return true if this order can be server by only 1 drone
