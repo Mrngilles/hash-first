@@ -48,4 +48,13 @@ class Drone (var id: Int = -1, var x: Int = 0, var y: Int = 0,
   def unload(order: Order, warehouse: Warehouse, commandCode: String): List[String] = {
     process(order, warehouse, "U")
   }
+
+  def deliver(order: Order): List[String] = {
+    val commands = new ListBuffer[String]
+    order.products.foreach(product => commands += s"$id D ${order.id} ${product.id} ${product.quantity}")
+
+    turns += distanceTo(order) + 1
+
+    commands.toList
+  }
 }
