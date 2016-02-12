@@ -37,10 +37,10 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
     nearestOrder
   }
 
-  def nearestWarehouse(warehouses: ListBuffer[Warehouse]): Warehouse = {
+  def nearestWarehouse(warehouses: ListBuffer[Warehouse], order: Order): Warehouse = {
     var nearestWarehouse: Warehouse = null
     var nearestDistance = Int.MaxValue
-    warehouses.foreach { warehouse =>
+    warehouses.filter(warehouse => warehouse.canServe(order)).foreach { warehouse =>
       val distance: Int = warehouse.distanceTo(this)
       if (distance < nearestDistance) {
         nearestDistance = distance
@@ -65,6 +65,12 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
   }
 
   def load(order: Order, warehouse: Warehouse): List[String] = {
+    order.products.foreach { onDroneProduct =>
+      warehouse.products = warehouse.products
+        .filter(product => product.equals(onDroneProduct))
+        .map(product => product.update(onDroneProduct.quantity))
+    }
+
     process(order, warehouse, "L")
   }
 

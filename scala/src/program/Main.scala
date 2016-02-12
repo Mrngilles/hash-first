@@ -138,15 +138,17 @@ object Main extends App {
 
     val nearestSmallOrder = drone.nearestOrder(smallOrders)
     if (nearestSmallOrder != null) {
-      val nearestWarehouse = drone.nearestWarehouse(warehouses)
-      commands ++= drone.load(nearestSmallOrder, nearestWarehouse)
-      commands ++= drone.deliver(nearestSmallOrder)
+      val nearestWarehouse = drone.nearestWarehouse(warehouses, nearestSmallOrder)
+      if (nearestWarehouse != null) {
+        commands ++= drone.load(nearestSmallOrder, nearestWarehouse)
+        commands ++= drone.deliver(nearestSmallOrder)
 
-      orders -= nearestSmallOrder
-      countCompletedOrder += 1
-      println(countCompletedOrder)
+        orders -= nearestSmallOrder
+        countCompletedOrder += 1
+        println(countCompletedOrder)
 
-      if (drone.isAvailable) queue += drone
+        if (drone.isAvailable) queue += drone
+      }
     }
   }
 
