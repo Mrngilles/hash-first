@@ -63,7 +63,7 @@ object Main extends App {
         var productId = 0
         var products = new ListBuffer[Product]
         line.split(" ").foreach { quantity =>
-          products += new Product(productId, quantity.toInt)
+          products += new Product(productId, quantity.toInt, productWeights(productId))
           productId += 1
         }
         warehouse.products = products.toList
@@ -87,7 +87,7 @@ object Main extends App {
         val products = new ListBuffer[Product]
         var product: Product = null
         line.split(" ").foreach { productId =>
-          product = new Product(productId.toInt, 1)
+          product = new Product(productId.toInt, 1, productWeights(productId))
           if (!products.contains(product)) {
             products += product
           } else {
@@ -105,6 +105,5 @@ object Main extends App {
     index += 1
   }
 
-  warehouses.foreach(println)
-  orders.foreach(println)
+  println(warehouses.size, orders.size)
 }
