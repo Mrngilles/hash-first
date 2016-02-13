@@ -87,12 +87,10 @@ object Main extends App {
           }
         } else {
           var productId = 0
-          var products = new ListBuffer[Product]
           line.split(" ").foreach { quantity =>
-            products += new Product(productId, quantity.toInt, productWeights(productId))
+            warehouse.products += (productId -> new Product(productId, quantity.toInt, productWeights(productId)))
             productId += 1
           }
-          warehouse.products = products
 
           warehouses += warehouse
         }
@@ -112,16 +110,15 @@ object Main extends App {
           order.y = array(1)
         } else if (orderIndex % 3 == 2) {
           val products = new ListBuffer[Product]
-          var product: Product = null
-          line.split(" ").foreach { productId =>
-            product = new Product(productId.toInt, 1, productWeights(productId.toInt))
-            if (!products.contains(product)) {
-              products += product
+          line.split(" ").foreach { productIdString =>
+            val productId: Int = productIdString.toInt
+            if (!products.contains(productId)) {
+              order.products += (productId -> new Product(productId, 1, productWeights(productId)))
             } else {
-              product.quantity += 1
+              val existingProduct = order.products(productId)
+              order.products += (productId -> new Product(productId, existingProduct.quantity + 1, productWeights(productId)))
             }
           }
-          order.products = products.toList
 
           orders += order
         }
