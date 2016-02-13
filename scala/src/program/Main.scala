@@ -151,11 +151,14 @@ object Main extends App {
 
   def generateCommands(): ListBuffer[String] = {
     val commands = new ListBuffer[String]()
-    val smallOrders = orders.filter(order => order.isSmall)
+    val smallOrders = orders.filter(order => order.isSmall).to[ListBuffer]
     val queue = drones
     var numOfCompletedOrders = 0
 
-    while (smallOrders.nonEmpty && queue.nonEmpty) {
+    orders.filter(order => order.numOfDrones > 1)
+      .map(order => smallOrders ++= order.subOrders())
+
+    while (smallOrders.nonEmpty && queue.nonEmpty && commands.size < numOfTurns) {
       val drone = queue.head
       queue -= drone
 
@@ -170,10 +173,6 @@ object Main extends App {
         if (drone.isAvailable) queue += drone
       }
     }
-
-    val set = scala.collection.mutable.Set[Int]()
-    orders.foreach(order => set += order.numOfDrones)
-    println(s"Num of combining drones $set")
 
     println(s"% turns used ${commands.size / numOfTurns.toFloat}")
     println(s"% completed orders ${numOfCompletedOrders / orders.size.toFloat}")
