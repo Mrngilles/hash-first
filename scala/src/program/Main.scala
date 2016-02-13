@@ -171,6 +171,7 @@ object Main extends App {
       }
     }
 
+    println(s"% turns used ${commands.size / numOfTurns.toFloat}")
     println(s"% completed orders ${numOfCompletedOrders / orders.size.toFloat}")
 
     commands
