@@ -171,6 +171,10 @@ object Main extends App {
       }
     }
 
+    val set = scala.collection.mutable.Set[Int]()
+    orders.foreach(order => set += order.numOfDrones)
+    println(s"Num of combining drones $set")
+
     println(s"% turns used ${commands.size / numOfTurns.toFloat}")
     println(s"% completed orders ${numOfCompletedOrders / orders.size.toFloat}")
 

@@ -17,6 +17,8 @@ class Order extends ProductContainer {
     totalWeight <= Main.maxPayLoad
   }
 
+  def numOfDrones = Math.ceil(totalWeight / Main.maxPayLoad.toFloat).toInt
+
   def distanceTo(drone: Drone): Int = {
     super.distanceTo(drone)
   }
