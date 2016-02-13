@@ -2,8 +2,6 @@ package datastructure
 
 import program.Main
 
-import scala.util.control.Breaks._
-
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -47,23 +45,24 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
   def process(order: Order, warehouses: ListBuffer[Warehouse]): List[String] = {
     val commands = new ListBuffer[String]
 
-    breakable {
-      val nearestWarehouses = warehouses.sortBy(warehouse => this.distanceTo(warehouse))
-      var onDemandProducts = order.products.values.toList
-      for (warehouse <- nearestWarehouses) {
-        val supply: (List[Product], List[Product]) = warehouse.supply(onDemandProducts)
+    val nearestWarehouses = warehouses.sortBy(warehouse => this.distanceTo(warehouse))
+    var onDemandProducts = order.products.values.toList
+    for (warehouse <- nearestWarehouses) {
+      val supply: (List[Product], List[Product]) = warehouse.supply(onDemandProducts)
 
-        val suppliedProducts = supply._1
+      val suppliedProducts = supply._1
+      if (suppliedProducts.nonEmpty) {
         commands ++= load(suppliedProducts, warehouse)
 
         onDemandProducts = supply._2
-        if (onDemandProducts.isEmpty) break
+        if (onDemandProducts.isEmpty) {
+          commands ++= deliver(order)
+          return commands.toList
+        }
       }
     }
 
-    commands ++= deliver(order)
-
-    commands.toList
+    List.empty
   }
 
   /**
@@ -72,7 +71,7 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
     */
   def generateCommands(products: List[Product], warehouse: Warehouse, commandCode: String): List[String] = {
     val commands = new ListBuffer[String]
-    products.foreach(product => commands += s"$id $commandCode ${warehouse.id} ${product.id} ${product.quantity}\n")
+    products.foreach(product => commands += s"${this.id} $commandCode ${warehouse.id} ${product.id} ${product.quantity}\n")
 
     turns += distanceTo(warehouse) + 1
 
@@ -89,7 +88,7 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
 
   def deliver(order: Order): List[String] = {
     val commands = new ListBuffer[String]
-    order.products.foreach{case (id, product) => commands += s"$id D ${order.id} ${product.id} ${product.quantity}\n"}
+    order.products.foreach{case (_, product) => commands += s"$id D ${order.id} ${product.id} ${product.quantity}\n"}
 
     turns += distanceTo(order) + 1
 

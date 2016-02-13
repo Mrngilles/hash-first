@@ -155,7 +155,7 @@ object Main extends App {
     val queue = drones
 
     while (smallOrders.nonEmpty && queue.nonEmpty) {
-      println(s"small orders ${smallOrders.size}, queue ${queue.size}")
+//      println(s"small orders ${smallOrders.size}, queue ${queue.size}")
 
       val drone = queue.head
       queue -= drone
@@ -173,7 +173,7 @@ object Main extends App {
     commands
   }
 
-  for (fileName <- Array("busy_day.in"/*, "mother_of_all_warehouses.in", "redundancy.in"*/)) {
+  for (fileName <- Array("busy_day.in", "mother_of_all_warehouses.in", "redundancy.in")) {
     println("FILE " + fileName)
     Main.parseInput("input/" + fileName)
     Main.generateOutput("output/" + fileName.replace(".in", ".out"), Main.generateCommands())

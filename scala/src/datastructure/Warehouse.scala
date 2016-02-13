@@ -16,22 +16,19 @@ class Warehouse extends ProductContainer {
     val remainingProducts = new ListBuffer[Product]
     val suppliedProducts = new ListBuffer[Product]
     onDemandProducts.foreach { product =>
-      if (this.products.contains(id)) {
-        val inStockQuantity = this.products(id).quantity
+      if (this.products.contains(product.id) && this.products(product.id).quantity > 0) {
+        val inStockQuantity = this.products(product.id).quantity
         val onDemandQuantity = product.quantity
 
         // warehouse doesn't have enough quantity to supply
         if (inStockQuantity < onDemandQuantity) {
           remainingProducts += new Product(product.id, onDemandQuantity - inStockQuantity, product.weight)
           suppliedProducts += new Product(product.id, inStockQuantity, product.weight)
-
-          // this product is no longer available in warehouse
-          this.products.remove(id)
         } else {
           suppliedProducts += new Product(product.id, onDemandQuantity, product.weight)
 
           // update quantity of this product in stock
-          this.products += (id -> new Product(product.id, inStockQuantity - onDemandQuantity, product.weight))
+          this.products += (product.id -> new Product(product.id, inStockQuantity - onDemandQuantity, product.weight))
         }
       } else {
         remainingProducts += product
