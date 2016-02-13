@@ -153,10 +153,9 @@ object Main extends App {
     val commands = new ListBuffer[String]()
     val smallOrders = orders.filter(order => order.isSmall)
     val queue = drones
+    var numOfCompletedOrders = 0
 
     while (smallOrders.nonEmpty && queue.nonEmpty) {
-//      println(s"small orders ${smallOrders.size}, queue ${queue.size}")
-
       val drone = queue.head
       queue -= drone
 
@@ -166,9 +165,13 @@ object Main extends App {
 
         smallOrders -= nearestSmallOrder
 
+        numOfCompletedOrders += 1
+
         if (drone.isAvailable) queue += drone
       }
     }
+
+    println(s"% completed orders ${numOfCompletedOrders / orders.size.toFloat}")
 
     commands
   }
