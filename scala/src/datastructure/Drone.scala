@@ -11,6 +11,10 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
   override def toString = s"Drone(id $id, ($x, $y), products = $products)"
 
   var turns = 0
+  var numOfCompletedOrders = 0
+  var sumEfficiency = 0.0
+
+  def avgEfficiency = sumEfficiency / numOfCompletedOrders
 
   def isAvailable = turns <= Main.numOfTurns
 
@@ -57,6 +61,10 @@ class Drone (var id: Int = -1, var products: List[Product] = List.empty) extends
         onDemandProducts = supply._2
         if (onDemandProducts.isEmpty) {
           commands ++= deliver(order)
+
+          sumEfficiency += order.totalWeight / Main.maxPayLoad.toFloat
+          numOfCompletedOrders += 1
+
           return commands.toList
         }
       }

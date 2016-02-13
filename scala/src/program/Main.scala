@@ -175,7 +175,18 @@ object Main extends App {
 
   for (fileName <- Array("busy_day.in", "mother_of_all_warehouses.in", "redundancy.in")) {
     println("FILE " + fileName)
-    Main.parseInput("input/" + fileName)
-    Main.generateOutput("output/" + fileName.replace(".in", ".out"), Main.generateCommands())
+
+    parseInput("input/" + fileName)
+    generateOutput("output/" + fileName.replace(".in", ".out"), generateCommands())
+
+    var sumEfficiency = 0.0
+    drones.foreach {drone =>
+//      println(s"Drone ${drone.id} has efficiency ${drone.avgEfficiency}")
+      sumEfficiency += drone.avgEfficiency
+    }
+    val avgEfficiency = sumEfficiency / drones.size
+    println(s"[Average efficiency of all drones is $avgEfficiency]")
+
+    println
   }
 }
